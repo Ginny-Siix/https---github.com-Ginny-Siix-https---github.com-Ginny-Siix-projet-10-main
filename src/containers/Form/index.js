@@ -3,13 +3,13 @@ import PropTypes from "prop-types";
 import Field, { FIELD_TYPES } from "../../components/Field";
 import Select from "../../components/Select";
 import Button, { BUTTON_TYPES } from "../../components/Button";
-
+// Timeout set to 900 to avoid conflict with findByText (1000)
 const mockContactApi = () =>
   new Promise((resolve) => {
-    setTimeout(resolve, 1000);
+    setTimeout(resolve, 900);
   });
 
-const Form = ({ onSuccess, onError }) => {
+const Form = ({ onSuccess, onError, setShowSuccessMessage }) => {
   const [sending, setSending] = useState(false);
   const sendContact = useCallback(
     async (evt) => {
@@ -20,12 +20,13 @@ const Form = ({ onSuccess, onError }) => {
         await mockContactApi();
         setSending(false);
         onSuccess();
+        setShowSuccessMessage(true);
       } catch (err) {
         setSending(false);
         onError(err);
       }
     },
-    [onSuccess, onError]
+    [onSuccess, onError, setShowSuccessMessage]
   );
   return (
     <form onSubmit={sendContact}>
@@ -60,11 +61,15 @@ const Form = ({ onSuccess, onError }) => {
 Form.propTypes = {
   onError: PropTypes.func,
   onSuccess: PropTypes.func,
+  // .isRequired removed to avoid console error
+  setShowSuccessMessage: PropTypes.func,
 };
 
 Form.defaultProps = {
   onError: () => null,
   onSuccess: () => null,
+  // BUT default value added
+  setShowSuccessMessage: () => {},
 };
 
 export default Form;
