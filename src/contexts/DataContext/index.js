@@ -5,6 +5,7 @@ import {
   useContext,
   useEffect,
   useState,
+  useMemo,
 } from "react";
 
 const DataContext = createContext({});
@@ -38,12 +39,15 @@ export const DataProvider = ({ children }) => {
   useEffect(() => {
     if (data) return;
     getData();
-  });
+  }, [data, getData]);
+
+  const contextValue = useMemo(
+    () => ({ data, error, last }),
+    [data, error, last]
+  );
 
   return (
-    <DataContext.Provider value={{ data, error, last }}>
-      {children}
-    </DataContext.Provider>
+    <DataContext.Provider value={contextValue}>{children}</DataContext.Provider>
   );
 };
 
